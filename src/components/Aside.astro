@@ -1,0 +1,32 @@
+---
+export interface Props {
+    heading: string;
+    text?: string | undefined;
+}
+
+const { heading, text } = Astro.props;
+---
+
+<aside>
+    <header>{heading}</header>
+    <div><slot />{text}</div>
+</aside>
+
+<style>
+    aside {
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        background-color: rgb(240, 234, 250);
+    }
+
+    header {
+        font-family: "Yeseva One", serif;
+        font-size: 1.1em;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+    }
+</style>

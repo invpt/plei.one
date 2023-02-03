@@ -1,0 +1,75 @@
+---
+import type { AstroComponentFactory } from "astro/dist/runtime/server";
+import Layout from "../../layouts/Layout.astro"
+import type { BlogPostFrontmatter, BlogPost } from "../../types";
+import { postSlug } from "./_utils";
+
+export async function getStaticPaths() {
+    const posts = await Astro.glob<BlogPostFrontmatter>("../../content/blog/*.mdx");
+
+    return posts
+        .filter(post => post.frontmatter.publishDate !== null)
+        .map(post => ({
+            params: { slug: postSlug(post.file) },
+            props: {
+                post: {
+                    url: `/blog/${postSlug(post.file)}`,
+                    title: post.frontmatter.title,
+                    description: post.frontmatter.description,
+                    publishDate: new Date(post.frontmatter.publishDate),
+                },
+                Content: post.Content,
+            }
+        }));
+}
+
+export interface Props {
+    post: BlogPost;
+    Content: AstroComponentFactory;
+}
+
+const { post, Content } = Astro.props;
+---
+
+<Layout title={`plei.one - ${post.title}`}>
+    <header>
+        <span>{post.title}</span>
+        <span>Published on {post.publishDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+    </header>
+    <main><Content /></main>
+</Layout>
+
+<style>
+    header {
+        display: flex;
+        flex-direction: column;
+
+		max-width: 725px;
+
+		margin: 0 auto;
+		padding: 20px 20px;
+
+        color: rgb(239, 215, 250);
+        background-color: #3b2166;
+    }
+
+    header>:first-child {
+        font-family: "Yeseva One", serif;
+        font-size: 40px;
+    }
+
+    header>:last-child {
+        font-family: "Lora", serif;
+        font-size: 15px;
+    }
+
+	main {
+		max-width: 700px;
+		margin: 0 auto;
+		padding: 10px 30px;
+		padding-bottom: 30px;
+
+		line-height: 1.5;
+        word-spacing: 0.05em;
+	}
+</style>

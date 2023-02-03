@@ -1,0 +1,53 @@
+---
+title: 'Memory ordering'
+description: 'A short introduction to memory ordering in computer architecture.'
+publishDate: null
+lang: 'en'
+---
+
+import Aside from "../../components/Aside.astro";
+
+<Aside>This article is a short introduction to memory ordering in computer architecture. If you're already familiar with memory ordering, then it might not be for you.</Aside>
+
+Modern processors have multiple cores that all execute code simultaneously and coexist in a singular shared memory space. Naturally, this state of affairs leads to a lot of difficulties in writing prorams that use this shared memory space. Most programs will use a high-level synchronization primitive like a [lock](https://en.wikipedia.org/wiki/Lock_(computer_science)) to avoid these problems, but how do locks safely synchronize your program? And considering that locks add more problems of their own (performance and deadlocking), how can we write programs that can run correctly on multiple cores without using any locks at all?
+
+Looking at C++, we'll find the [`<atomic>` library](https://en.cppreference.com/w/cpp/atomic/atomic), which allows programmers to use atomic memory operations. "Atomic" in this case means that the operation cannot be observed in a partially complete state - at any point in time, it has either fully completed or not yet had any effect at all[^1]. For example, `fetch_add` allows a programmer to add a number to a memory location with the guarantee that other processor cores will either observe the full result of the operation or observe the previous value. In a simple world, atomic memory operations would be all we need. But the world is not always so simple!
+
+[^1]: From the perspective of the programmer, at least! The processor still has to perform the operation, which will necessarily take time, but the programmer should be able to pretend that it's totally atomic.
+
+Every operation in the `<atomic>` library takes an additional, optional parameter of type `std::memory_order`. By default, the value of this parameter is `std::memory_order::seq_cst`, but there are six different values possible in C++.
+
+Each of these variants correspond to a different level of memory ordering guarantees. The simplest type of guarantee is the strongest - that there is a single global order of all memory operations and this order is observed as being the same across all cores. This is `std::memory_order::seq_cst`. Modern CPUs have two performance-optimizing features which can make it advantageous for the processor to provide lesser guarantees:
+
+1. Caching. This is the use of a smaller, faster memory closer to the processor that can be used as a buffer between memory and the processor. The processor might only write to the cache rather than writing to memory immediately, then may later decide to perform the (slow) actual memory write.
+
+   We can see the problems that caching introduces by imagining a multicore system where each core has its own cache. If one core makes two writes to memory with the first written only to the core-local cache and the second written directly to memory, then another core in the system could potentially observe the second write as having happened before the first write.
+
+2. Instruction-level parallelism. This is the reordering of instructions by a processor core in order to allow the program to execute more quickly while keeping the illusion from the perspective of the core on which the program is executed that everything is still sequential.
+
+   This feature causes more problems, which can be seen by imagining a multicore system where the processor implements some amount of instruction-level parallelism. The code running on the core could make two writes to two different memory locations followed by a read from the second memory location. To improve throughput, perhaps the lexically second write is performed chronologically first so that the read can take place sooner, and then the lexically first write is performed chronologically second. Then from the perspective of another core, these memory operations could be observed as having happened in a different order than they did in the program code.
+
+Any given processor is going to have some baseline level of guarantees. Some architectures, including x86, provide stronger guarantees by default, while some, including [RISC-V](https://en.wikipedia.org/wiki/RISC-V) and ARM, provide weaker guarantees by default. The `std::memory_order` parameter allows the programmer to only worry about what guarantees they need, while the compiler can worry about how to implement them. When the programmer requests a higher level of guarantee than is already provided by the architecture, the compiler will pick an instruction sequence that *does* provide those guarantees. It varies by architecture on what this will look like. There might be a distinct load or store instruction which provides greater guarantees, or there might be a single instruction which performs a [memory fence](https://en.wikipedia.org/wiki/Memory_barrier), or maybe something else entirely.
+
+## `std::memory_order` details
+
+The specific values of `std::memory_order` are as follows:
+- `std::memory_order::relaxed`, which provides no guarantees
+- `std::memory_order::consume`, which I will be disregarding[^2]
+- `std::memory_order::acquire`, which provides *acquire* consistency
+- `std::memory_order::release`, which provides *release* consistency
+- `std::memory_order::acq_rel`, which provides both acquire and release consistency
+- `std::memory_order::seq_cst`, which provides acquire, release, and *sequential consistency*.
+
+[^2]: I'm disregarding this variant because it's mostly specific to compiler optimizations and irrelevant to typical hardware memory models.
+
+The meanings of each of these variants is formally defined in the C++ specification. What follows is an approximation of the definitions:
+- When an operation *O* on thread *A* is executed with acquire consistency, it is implied that other threads that cannot yet observe the effect of *O* will also be unable to observe any other operations that occur on thread *A* after the operation *O*.
+  - In other words, operations that occur after *O* on thread *A* cannot be observed as having occurred before *O*.
+- When an operation *O* on thread *A* is executed with release consistency, it is implied that other threads that observe the effect of *O* will also be able to observe any other operations that occurred on thread *A* before the operation *O*.
+  - In other words, operations that occur before *O* on thread *A* cannot be observed as having occurred after *O*.
+- When an operation *O* on thread *A* is executed with sequential consistency, it is implied that any other sequentially consistent operation *P* will be observed as having either happened before *O* or after *O* in all threads, and all threads will observe exactly the same order.
+
+For clarity, when I speak of "other operations," I mean any operation at all, whether it be an atomic or non-atomic, and whether it be on the same object or a different object.
+
+"Acquire" and "release" are named that way because of locks. You need to have acquire consistency when performing the operation that acquires a lock, because it would be bad if one core acquired a lock and modified things while another core checked and observed the lock to be unused and yet also observe the things having been modified. Similarly, release semantics are needed when releasing lock because it would be bad if a lock was released and another core could see it as unlocked but with an incomplete updates.

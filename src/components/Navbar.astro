@@ -1,0 +1,125 @@
+---
+import { Icon } from "astro-icon";
+---
+
+<nav>
+    <div class="nav-content">
+        <header>
+            <a href="/">
+                <span>plei.one &nbsp;</span>
+                <span>(by invpt)</span>
+            </a>
+        </header>
+        
+        <div class="nav-links">
+            <a href="/" class={Astro.url.pathname === "/" ? "nav-link current" : "nav-link"}>home</a>
+            <a href="/blog" class={Astro.url.pathname === "/blog" ? "nav-link current" : "nav-link"}>blog</a>
+            <div style="flex:1"></div>
+            <a class="icon-link" href="https://github.com/invpt" title="invpt on GitHub"><Icon name="mdi:github" height="35" /></a>
+        </div>
+    </div>
+</nav>
+
+<style>
+    nav {
+        display: flex;
+        justify-content: center;
+
+        padding: 16px 24px;
+
+        color: rgb(229,195,245);
+        background-color: rgb(49, 28, 84);
+    }
+
+    .nav-content {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 20px 32px;
+
+        width: 1200px;
+    }
+
+    .nav-content>header>a {
+        all: unset;
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+
+        display: flex;
+        align-items: baseline;
+
+        margin-right: 16px;
+
+        font-family: "Yeseva One", serif;
+        font-size: 32px;
+    }
+
+    .nav-content>header {
+        transition: transform 0.125s;
+    }
+
+    .nav-content>header:hover {
+        transform: rotate(-1deg) scaleX(1);
+    }
+
+    header>a>:nth-child(2) {
+        font-family: "Share Tech", sans-serif;
+        font-size: 22px;
+        letter-spacing: 1px;
+        font-style: italic;
+        color: rgb(217, 165, 247);
+    }
+
+    .nav-links {
+        flex: 1;
+
+        display: flex;
+        align-items: center;
+
+        gap: 20px 32px;
+    }
+
+    .nav-link {
+        font-family: "Fira Mono", monospace;
+        font-size: 21px;
+        font-weight: bold;
+
+        color: rgb(217, 165, 247);
+
+        transition: transform 0.25s, text-shadow 0.15s, color 0.25s;
+    }
+
+    .nav-link.current {
+        text-decoration: none;
+        color: rgb(197, 147, 226);
+    }
+
+    .nav-link:not(.current):hover {
+        color: rgb(231, 111, 235);
+        transform: scaleX(1.2) rotate(2.5deg) translateY(3px) translateX(1.5px);
+        text-shadow: -6px -12px rgb(150, 65, 153);
+    }
+
+    .icon-link {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 12px;
+        
+        color: inherit;
+
+        transition: transform 0.25s;
+    }
+
+    .icon-link:hover:nth-child(odd) {
+        transform: rotate(-15deg);
+    }
+
+    .icon-link:hover:nth-child(even) {
+        transform: rotate(15deg);
+    }
+    
+    .icon-link>svg {
+        display: block;
+    }
+</style>

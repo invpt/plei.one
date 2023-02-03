@@ -1,0 +1,57 @@
+---
+import type { BlogPost } from "../types";
+
+export interface Props {
+    post: BlogPost;
+}
+
+const { post } = Astro.props;
+---
+
+<a class="blog-card" href={post.url}>
+    <header><span>{post.title}</span><span>{post.publishDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span></header>
+    <div>{post.description}</div>
+</a>
+
+<style>
+    .blog-card { 
+        all: unset;
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+
+        padding: 20px;
+        gap: 8px;
+
+        background-color: rgb(240, 240, 252);
+        color: rgb(0, 0, 121);
+        border-radius: 5px;
+
+        box-shadow: 0 0 0 0 rgb(222, 222, 255);
+
+        transition: box-shadow 0.2s;
+    }
+
+    .blog-card:hover {
+        box-shadow: 6px 6px 0 0 rgb(222, 222, 255);
+    }
+
+    .blog-card>header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .blog-card>header>:first-child {
+        font-family: "Yeseva One", serif;
+        font-size: 20px;
+    }
+
+    .blog-card>header>:last-child {
+        font-family: "Lora", serif;
+        font-size: 14px;
+        color: rgb(123, 123, 192);
+        white-space: nowrap;
+    }
+</style>

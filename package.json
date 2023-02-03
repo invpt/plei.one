@@ -1,0 +1,24 @@
+{
+  "name": "plei.one",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^0.16.0",
+    "@astrojs/rss": "^2.1.0",
+    "@fontsource/fira-mono": "^4.5.10",
+    "@fontsource/lora": "^4.5.12",
+    "@fontsource/share-tech": "^4.5.10",
+    "@fontsource/yeseva-one": "^4.5.10",
+    "astro": "^2.0.6",
+    "astro-icon": "^0.8.0",
+    "zod": "^3.20.2"
+  }
+}

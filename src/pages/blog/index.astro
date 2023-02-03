@@ -1,0 +1,52 @@
+---
+import Icon from "astro-icon";
+
+import Layout from '../../layouts/Layout.astro';
+import BlogCard from "../../components/BlogCard.astro";
+import { listPosts } from '../../utils';
+
+const posts = await listPosts();
+---
+
+<Layout title="plei.one - Blog">
+	<main>
+		<h1 class="blog-posts-header">
+			<span>Blog posts</span>
+			<a class="rss-button" href="/blog/rss.xml" title="RSS Feed"><Icon name="mdi:rss" height="35" /></a>
+		</h1>
+		<div class="blog-posts">
+			{posts.map(post => <BlogCard post={post} />)}
+		</div>
+	</main>
+</Layout>
+
+<style>
+	main {
+		max-width: 600px;
+		margin: 0 auto;
+		padding: 0 30px;
+		padding-bottom: 30px;
+	}
+
+	.blog-posts-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.rss-button {
+		all: unset;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.rss-button>* {
+		display: block
+	}
+
+	.blog-posts {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+</style>
