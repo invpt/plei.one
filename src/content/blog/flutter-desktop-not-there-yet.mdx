@@ -5,7 +5,9 @@ publishDate: 'Feb 2, 2023'
 lang: 'en'
 ---
 
-As someone whose frontend development experience has largely been with React and similar libraries, Flutter looks like a promising way to create cross-platform applications that don't run in a web browser. On mobile, Flutter is a strong competitor to both React Native and web-based solutions. And since Flutter also supports desktop, you should in theory be able to get the benefit of React-style UI plus the static typing and cohesive design of Flutter's host language Dart as opposed to JS/TS, all without bundluing a web browser.
+import Aside from "../../components/Aside.astro";
+
+As someone whose frontend development experience has largely been with React and similar libraries, Flutter looks like a promising way to create cross-platform applications that don't run in a web browser. On mobile, Flutter is a strong competitor to both React Native and web-based solutions. And since Flutter also supports desktop, you should in theory be able to get the benefit of React-style UI plus the static typing and cohesive design of Flutter's host language Dart as opposed to JS/TS, all without bundling a web browser.
 
 In practice, though, Flutter is currently not a great option if you want to build a new desktop application from the ground up. What follows is a quick summary of the issues I encountered while using Flutter to do exactly this myself.
 
@@ -25,7 +27,9 @@ I am far from an expert on the internals of Flutter, but if I had to guess, a lo
 
 ## Desktop-specific limitations
 
-As a result of the underdeveloped ecosystem, you'll also find you just can't do some things that are really common in desktop apps. For example, you can't have multiple windows in one process. If you need two or more windows for your application to run, you will have to start a separate processes for each window and perform IPC between the processes. Another example is that you cannot customize right-click menus. You'll have to build them yourself. Flutter even has a barebones right-click menu system specifically for text fields, but you can't customize it (yet!) or use it anywhere else (yet!).
+As a result of the underdeveloped ecosystem, you'll also find you just can't do some things that are really common in desktop apps. For example, you can't have multiple windows in one process. If you need two or more windows for your application to run, you will have to start a separate processes for each window and perform IPC between the processes. Another example is that you cannot customize right-click menus. You'll have to build them yourself. Flutter even has a barebones right-click menu system specifically for text fields, ~~but you can't customize it or use it anywhere else~~.
+
+<Aside heading="Correction">As it turns out, custom context menus were released as a feature in Flutter 3.7, two weeks before I published this article. Thanks Loïc Sharma!</Aside>
 
 To be fair, these limitations are somewhat to be expected of early-stage cross-platform app development toolkits on desktop, and for some apps they don't actually matter.
 
